@@ -3,3 +3,4 @@ description = A database for managing video metadata.
 core = 7.x
 version = 7.x-2.0-dev
 files[] = assetmanagement.test
+configure = admin/config/assetmanagement/manage

@@ -1,8 +1,10 @@
 <?php
 /**
 * @file
-* Custom Functionality for an Asset Management System.
+* Module file for assetmanagement.
+* Provices custom Functionality for an Asset Management System.
 */
+
 /**
 * Implements hook_help().
 */
@@ -78,43 +80,45 @@ function assetmanagement_admin_settings_form($node, &$form_state) {
 		'#collapsed' => FALSE,
 	);
 	
-	$form['import-publish_control']['editor_import'] = array(
+	$form['import-publish_control']['assetmanagement_editor_import'] = array(
 		'#title' => t('Editor Imports'),
 		'#description' => t('Enable Editors to import new records from thePlaform.'),
 		'#type' => 'checkbox',
-		'#default_value' => variable_get('editor_import', 0),
+		'#default_value' => variable_get('assetmanagement_editor_import'),
 	);
-	$form['import-publish_control']['editor_publish'] = array(
+	$form['import-publish_control']['assetmanagement_editor_publish'] = array(
 		'#title' => t('Editor Publishing'),
 		'#description' => t('Enable Editors to publish metadata to thePlaform.'),
 		'#type' => 'checkbox',
-		'#default_value' => variable_get('editor_publish', 0),
+		'#default_value' => variable_get('assetmanagement_editor_publish'),
 	);
-	$form['import-publish_control']['blank_records'] = array(
+	$form['import-publish_control']['assetmanagement_blank_records'] = array(
 		'#title' => t('Create Blank Records'),
 		'#description' => t('If enabled when publishing if no match found a blank or shell record is created in thePlatform.'),
 		'#type' => 'checkbox',
-		'#default_value' => variable_get('blank_records', 0),
+		'#default_value' => variable_get('assetmanagement_blank_records'),
 	);
+	/*
 	$form['submit'] = array(
 		'#type' => 'submit',
 		'#value' => t('Save'),
 	);
+	*/
 	
-	
-	return $form;
+	// return $form;
+	return system_settings_form($form);
 }
 /**
 * Process Asset Management Admin Settings form submission.
-*/
+
 function assetmanagement_admin_settings_form_submit($form, &$form_state) {
 	// Rebuild the form.
 	$form_state['rebuild'] = TRUE;
 	
 	// Save Asset Management setting variables.
-	variable_set('editor_import', $form_state['values']['editor_import']);
-	variable_set('editor_publish', $form_state['values']['editor_publish']);
-	variable_set('blank_records', $form_state['values']['blank_records']);
+	variable_set('assetmanagement_editor_import', $form_state['values']['assetmanagement_editor_import']);
+	variable_set('assetmanagement_editor_publish', $form_state['values']['assetmanagement_editor_publish']);
+	variable_set('assetmanagement_blank_records', $form_state['values']['assetmanagement_blank_records']);
 	// Notify user
 	drupal_set_message(t('Fan-daby-dozy - settings saved'));
-}
+}*/
