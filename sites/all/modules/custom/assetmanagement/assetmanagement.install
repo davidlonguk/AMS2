@@ -78,15 +78,12 @@ function _create_taxonomy(){
   
   // Get the vocabulary ID.
   $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = 'vocabulary_channel_brands'")->fetchField();
-
-  // $terms = array('History','H2','Lifetime','CI','Bio',);
-    
+   
   //Create initial channel taxonomy terms
   taxonomy_term_save((object) array(
   'name' => 'History',
   'vid' => $vid,
-  'field_chan_number_sky' => 529,    
-));
+   ));
   
   // Give user feedback.
   drupal_set_message($t('Asset Management System Channel Taxonomy created. Huzzah!'));
@@ -131,7 +128,7 @@ function _create_taxonomy(){
 	),
   );
   
-
+/**
   $fields['field_assetmanagement_show_name'] = array(
   	'field_name' => 'field_assetmanagement_show_name',
   	'type' => 'text',
@@ -139,6 +136,8 @@ function _create_taxonomy(){
   		'max_length' => 255,
   	),
   );
+ 
+ */
   
   $fields['field_assetmanagement_show_url'] = array(
   	'field_name' => 'field_assetmanagement_show_url',
@@ -186,7 +185,7 @@ function _create_taxonomy(){
     ),
 	
   );
-  
+  /*
   $instances['field_assetmanagement_show_name'] = array(
   	'field_name' => 'field_assetmanagement_show_name',
 	'label' => $t('Show Name/Title'),
@@ -201,6 +200,9 @@ function _create_taxonomy(){
 	
 	
   );
+   
+   */
+  
   $instances['field_assetmanagement_show_url'] = array(
   	'field_name' => 'field_assetmanagement_show_url',
 	'label' => $t('Show Page Link'),
