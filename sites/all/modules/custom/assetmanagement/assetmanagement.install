@@ -4,30 +4,77 @@
  * Asset Management System installation
  */
 
+// Machine name for our custom node
+// define('NODE_NAME', 'assetmanagement_show');
+// Machine name for our custom taxonomy
+// define('TAXONOMY_NAME', 'vocabulary_channel_brands');
+
 /**
  * Implements hook_install().
  */
 function assetmanagement_install() {
+    _set_default_variables();
+    _create_taxonomy();
+    _create_content_type();
+}
+
+/**
+ *  Set Default Variables for use in admin panel
+ */
+function _set_default_variables() {    
+    
   // Set default variables.
   variable_set('assetmanagement_editor_import', 0);
   variable_set('assetmanagement_editor_publish', 0);
   variable_set('assetmanagement_blank_records', 0);
-
-  // Get localization function for installation as t() may be unavailable.
-  $t = get_t();
-
+  
+  // Get localization function for variables as t() may be unavailable.
+    $t = get_t();
+    
   // Give user feedback.
   drupal_set_message($t('Asset Management System variables created. Shibby!'));
+}
+
+/**
+ * Programattically Creating Taxonomy for Channels/Brands
+ */
+   
+function _create_taxonomy(){
+   // Get localization function for taxonomy as t() may be unavailable.
+    $t = get_t();
+    
+    $term = new stdClass();
+    $term->name = $t('Channels/Brands');
+    $term->machine_name = 'vocabulary_channel_brands';
+    $term->description = $t('list of channels shows can be associated with');
+    $term->heirarchy = 1;
+    $term->module = 'assetmanagement';
+    $term->weight = 1;
+    taxonomy_vocabulary_save($term);
+    
+    // Create a field
+ $field = array(
+    'field_name' => 'field_chan_number_sky',
+    'type' => 'text',
+    'label' => $t('Sky Channel')
+  );
+  field_create_field($field);
+ 
+  // Attach the field to our taxonomy entity
+  $instance = array(
+      'field_name' => 'field_chan_number_sky',
+      'entity_type' => 'taxonomy_term',
+      'bundle' => 'vocabulary_channel_brands',
+      'label' => $t('Channels/Brands'),
+      'description' => $t('list of channels shows can be associated with'),
+      'required' => TRUE,
+      'widget' => array(
+        'type' => 'text_textfield',
+        'weight' => 3
+      )
+  );
+  field_create_instance($instance);
   
-  
-  // Programattically Creating Taxonomy for Channels/Brands
-  
-  // Create Vocab
-  taxonomy_vocabulary_save((object) array(
-  'name' => 'Channels/Brands',
-  'machine_name' => 'vocabulary_channel_brands',
-  'description' => $t('list of channels shows can be associated with'),
-));
   
   // Get the vocabulary ID.
   $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = 'vocabulary_channel_brands'")->fetchField();
@@ -38,13 +85,21 @@ function assetmanagement_install() {
   taxonomy_term_save((object) array(
   'name' => 'History',
   'vid' => $vid,
+  'field_chan_number_sky' => 529,    
 ));
   
   // Give user feedback.
   drupal_set_message($t('Asset Management System Channel Taxonomy created. Huzzah!'));
-  
-  
-// Content Type Definition
+  }
+ 
+/**
+ * Create content types
+ */
+ function _create_content_type(){ 
+  // Get localization function for contenty_type as t() may be unavailable.
+    $t = get_t();
+    
+// AMS Show Content Type Definition
   $content_type = array(
   	'type' => 'assetmanagement_show',
 	'name' => $t('AMS Show'),
@@ -61,7 +116,7 @@ function assetmanagement_install() {
   node_type_save($node_type);
   
   // Add a field for the body.
-  node_add_body_field($node_type, $t('Description'));
+  node_add_body_field($node_type, $t('Description (optional)'));
   
   // Add custom fields see field_create_field
   $fields = array();
@@ -103,9 +158,10 @@ function assetmanagement_install() {
   	'type' => 'taxonomy_term_reference',
       'settings' => array(
         'allowed_values' => array(
-          array(
-            'vocabulary' => $vocabulary->vocabulary_channel_brands,
-            'parent' => 0
+            array(
+            'vocabulary' => 'vocabulary_channel_brands',
+            'parent' => 0,
+           ),
           ),
         ),
   );
@@ -168,9 +224,19 @@ function assetmanagement_install() {
   	'field_name' => 'field_assetmanagement_show_chan',
 	'label' => $t('Brand or Channel'),
 	'description' => $t('Channel(s) this show is broadcast on. Also links with the approriate thePlatform account.'),
-	'widget' => array(
-      'type' => 'taxonomy_autocomplete',
-    ),
+	'required' => TRUE,
+      'widget' => array(
+        'type' => 'options_select',
+        'weight' => -10,
+        ),
+      /**
+       'settings' => array(
+        'allowed_values' => array(
+            'vocabulary' => 'vocabulary_channel_brands',
+            'parent' => 0
+          ),
+        ),
+       */
   );
   
   foreach ($instances as $instance) {
@@ -230,7 +296,11 @@ function assetmanagement_uninstall() {
   field_purge_batch(1000);
   
   // Remove custom Taxonomy vocab
-  // Get the vocabulary ID.
+// Remove 
+ field_delete_field('field_chan_number_sky');
+ field_purge_batch(1000);
+ drupal_set_message($t('AMS Taxonomy Vocabs custom fields removed.'));
+// Get the vocabulary ID.
   $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = 'vocabulary_channel_brands'")->fetchField();
   taxonomy_vocabulary_delete($vid);
   drupal_set_message($t('AMS Taxonomy Vocabs removed. Au revoir.'));
