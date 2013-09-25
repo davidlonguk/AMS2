@@ -690,6 +690,18 @@ abstract class FeedsProcessor extends FeedsPlugin {
         case 'guid':
           $entity_id = $query->condition('guid', $value)->execute()->fetchField();
           break;
+        default:
+          $targets = $this->getMappingTargets();
+          if (isset($targets[$target]['unique_callbacks']) && isset($targets[$target]['bundle_name'])) {
+            $callbacks = $targets[$target]['unique_callbacks'];
+            $bundle_name = $targets[$target]['bundle_name'];
+            foreach ($callbacks as $callback) {
+              if (function_exists($callback) && $entity_id = $callback($target, $value, $this->entityType(), $bundle_name)) {
+                // Stop at the first unique ID returned by a callback.
+                break;
+              }
+            }
+          }
       }
       if (isset($entity_id)) {
         // Return with the content id found.

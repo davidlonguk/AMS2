@@ -14,7 +14,7 @@
  */
 function ams_install() {
     _set_default_variables();
-    _create_taxonomy();
+    _create_taxonomies();
     _create_content_type();
 }
 
@@ -39,18 +39,21 @@ function _set_default_variables() {
  * Programattically Creating Taxonomy for Channels/Brands
  */
    
-function _create_taxonomy(){
+function _create_taxonomies(){
    // Get localization function for taxonomy as t() may be unavailable.
     $t = get_t();
     
-    $term = new stdClass();
-    $term->name = $t('Channels/Brands');
-    $term->machine_name = 'vocabulary_channel_brands';
-    $term->description = $t('list of channels shows can be associated with');
-    $term->heirarchy = 1;
-    $term->module = 'ams';
-    $term->weight = 1;
-    taxonomy_vocabulary_save($term);
+    /**
+     * Create Channels taxonomy
+     */
+    $channelTerm = new stdClass();
+    $channelTerm->name = $t('Channels/Brands');
+    $channelTerm->machine_name = 'vocabulary_channel_brands';
+    $channelTerm->description = $t('list of channels shows can be associated with');
+    $channelTerm->heirarchy = 1;
+    $channelTerm->module = 'ams';
+    $channelTerm->weight = 1;
+    taxonomy_vocabulary_save($channelTerm);
     
     // Create a field
  $field = array(
@@ -65,9 +68,9 @@ function _create_taxonomy(){
       'field_name' => 'field_chan_number_sky',
       'entity_type' => 'taxonomy_term',
       'bundle' => 'vocabulary_channel_brands',
-      'label' => $t('Channels/Brands'),
-      'description' => $t('list of channels shows can be associated with'),
-      'required' => TRUE,
+      'label' => $t('Sky Channel Number'),
+      'description' => $t('E.g. 531'),
+      'required' => FALSE,
       'widget' => array(
         'type' => 'text_textfield',
         'weight' => 3
@@ -91,16 +94,155 @@ function _create_taxonomy(){
   
   // Give user feedback.
   drupal_set_message($t('Asset Management System Channel Taxonomy created. Huzzah!'));
+  
+  
+  
+  
+  
+  /**
+   * Create Shows taxonomy
+   */
+
+    $showTerm = new stdClass();
+    $showTerm->name = $t('Shows');
+    $showTerm->machine_name = 'vocabulary_shows';
+    $showTerm->description = $t('list of Shows');
+    $showTerm->heirarchy = 1;
+    $showTerm->module = 'ams';
+    $showTerm->weight = 2;
+    taxonomy_vocabulary_save($showTerm);
+    
+
+    // Create a fields  
+    $showFields = array();
+    
+    $showFields['field_ams_guid'] = array(
+       'field_name' => 'field_ams_guid',
+       'type' => 'text',
+       'label' => $t('ID')
+     );
+
+    $showFields['field_ams_url'] = array(
+       'field_name' => 'field_ams_url',
+       'type' => 'text',
+       'label' => $t('URL')
+     );
+
+    $showFields['field_ams_image'] = array(
+           'field_name' => 'field_ams_image',
+           'type' => 'image',
+     );
+
+     $showFields['field_ams_show_chan'] = array(
+           'field_name' => 'field_ams_show_chan',
+           'type' => 'taxonomy_term_reference',
+         'settings' => array(
+           'allowed_values' => array(
+               array(
+               'vocabulary' => 'vocabulary_channel_brands',
+               'parent' => 0,
+              ),
+             ),
+           ),
+     );
+
+     $showFields['field_ams_tags'] = array(
+           'field_name' => 'field_ams_tags',
+           'type' => 'taxonomy_term_reference',
+         'settings' => array(
+           'allowed_values' => array(
+               array(
+               'vocabulary' => 'tags',
+               'parent' => 0,
+              ),
+             ),
+           ),
+     );
+     
+  
+    foreach ($showFields as $showField) {
+       field_create_field($showField);
+     }
+  
+  
+  // Attach the field to our taxonomy entity
+  $showInstances = array();
+  
+  $showInstances['field_ams_guid'] = array(
+  	'field_name' => 'field_ams_guid',
+	'label' => $t('Show ID'),
+	'description' => $t('Must be unique. Format first 3 letters of show then 3 numbers incrementing from 001 until unique eg ICE001.'),
+	'widget' => array(
+            'type' => 'text_textfield',
+        ),
+	'required' => TRUE,
+	'settings' => array(
+            'text_processing' => 0,
+            'max_length' => 6,
+        ),
+	
+  );
+  
+  $showInstances['field_ams_url'] = array(
+  	'field_name' => 'field_ams_url',
+	'label' => $t('Link/URL'),
+	'description' => $t('optional link to page on website.'),
+	'widget' => array(
+      'type' => 'text_textfield',
+    ),
+    'settings' => array(
+      'text_processing' => 0,
+    ),
+  );
+  $showInstances['field_ams_image'] = array(
+  	'field_name' => 'field_ams_image',
+	'label' => $t('Image'),
+	'description' => $t('optional Image.'),
+	'widget' => array(
+      'type' => 'image_image',
+    ),
+  );
+  // add field linked with channels taxonomy
+  $showInstances['field_ams_show_chan'] = array(
+  	'field_name' => 'field_ams_show_chan',
+	'label' => $t('Brand or Channel'),
+	'description' => $t('Channel(s) this show is broadcast on. Also links with the approriate thePlatform account.'),
+	'required' => FALSE,
+      'widget' => array(
+        'type' => 'options_select',
+        'weight' => -10,
+        ),
+  );
+  // add link to the tags taxonomy
+  $showInstances['field_ams_tags'] = array(
+  	'field_name' => 'field_ams_tags',
+	'label' => $t('Keywords / Tags'),
+	'description' => $t('Keywords/Tags are stored in the tags taxonomy'),
+	'required' => FALSE,
+      'widget' => array(
+        'type' => 'taxonomy_autocomplete',
+        'weight' => -10,
+        ),
+   );
+  
+  foreach ($showInstances as $showInstance) {
+    $showInstance['entity_type'] = 'taxonomy_term';
+    $showInstance['bundle'] = 'vocabulary_shows';
+    field_create_instance($showInstance);
   }
- 
-/**
+  
+  
+  // END of Taxonomy Creation
+}
+  
+  /**
  * Create content types
  */
  function _create_content_type(){ 
   // Get localization function for contenty_type as t() may be unavailable.
     $t = get_t();
     
-    
+  /**  
     
 // AMS Show Content Type Definition
   $content_type = array(
@@ -244,13 +386,14 @@ function _create_taxonomy(){
   // Give user feedback.
   drupal_set_message($t('Asset Management System AMS Show content type created. Yipee!'));
   
-  
+  */
+    
   // AMS Video Content Type Definition
   $content_type = array(
   	'type' => 'ams_video',
 	'name' => $t('AMS Video'),
 	'description' => $t('Metadata for a Video'),
-	'title_label' =>  $t('Video Title'),
+	'title_label' =>  $t('Video Name'),
 	'base' => 'node_content',
 	'custom' => TRUE,
   );
@@ -276,7 +419,7 @@ function _create_taxonomy(){
   
   $fields['field_ams_video_bcid'] = array(
   	'field_name' => 'field_ams_video_bcid',
-  	'type' => 'number',
+  	'type' => 'number_integer',
   	'settings' => array(
   	'max_length' => 15,
   	),
@@ -323,6 +466,30 @@ function _create_taxonomy(){
     ),
   );
   
+ /* $fields['field_ams_show_chan'] = array(
+  	'field_name' => 'field_ams_show_chan',
+  	'type' => 'taxonomy_term_reference',
+      'settings' => array(
+        'allowed_values' => array(
+            array(
+            'vocabulary' => 'vocabulary_channel_brands',
+            'parent' => 0,
+           ),
+          ),
+        ),
+  );
+  $fields['field_ams_show_tags'] = array(
+  	'field_name' => 'field_ams_show_tags',
+  	'type' => 'taxonomy_term_reference',
+      'settings' => array(
+        'allowed_values' => array(
+            array(
+            'vocabulary' => 'tags',
+            'parent' => 0,
+           ),
+          ),
+        ),
+  );*/
   
   foreach ($instances as $instance) {
     $instance['entity_type'] = 'node';
@@ -366,7 +533,7 @@ function ams_uninstall() {
   drupal_set_message($t('All AMS Show content removed. Let us have a moment silence.'));
 
   // Remove all fields and field instances.
-  foreach (field_info_instances('node', 'ams_show') as $field_name => $instance) {
+  foreach (field_info_instances('node', 'ams_video') as $field_name => $instance) {
     field_delete_field($field_name);
     field_delete_instance($instance);
   }
@@ -388,6 +555,10 @@ function ams_uninstall() {
 // Get the vocabulary ID.
   $vid = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = 'vocabulary_channel_brands'")->fetchField();
   taxonomy_vocabulary_delete($vid);
+  
+  $vid2 = db_query("SELECT vid FROM {taxonomy_vocabulary} WHERE machine_name = 'vocabulary_shows'")->fetchField();
+  taxonomy_vocabulary_delete($vid2);
+  
   drupal_set_message($t('AMS Taxonomy Vocabs removed. Au revoir.'));
   
   
