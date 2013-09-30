@@ -11,7 +11,7 @@
 /**
  * Theme a status message
  */
-function theme_views_data_export_message($var) {
+function theme_ams_tp_push_message($var) {
   $output = '';
   $output .= '<div class="messages status ' . $var['type'] . '">';
   $output .= $var['message'];
@@ -29,17 +29,17 @@ function theme_views_data_export_message($var) {
  * e.g.
  * For the view "export_test" with the display "page_1" and the type "csv" you
  * would have the following options.
- *   views_data_export_feed_icon__export_test__page_1__csv
- *   views_data_export_feed_icon__export_test__page_1
- *   views_data_export_feed_icon__export_test__csv
- *   views_data_export_feed_icon__page_1__csv
- *   views_data_export_feed_icon__page_1
- *   views_data_export_feed_icon__csv
- *   views_data_export_feed_icon
+ *   ams_tp_push_feed_icon__export_test__page_1__csv
+ *   ams_tp_push_feed_icon__export_test__page_1
+ *   ams_tp_push_feed_icon__export_test__csv
+ *   ams_tp_push_feed_icon__page_1__csv
+ *   ams_tp_push_feed_icon__page_1
+ *   ams_tp_push_feed_icon__csv
+ *   ams_tp_push_feed_icon
  *
  * @ingroup themeable
  */
-function theme_views_data_export_feed_icon($variables) {
+function theme_ams_tp_push_feed_icon($variables) {
   extract($variables, EXTR_SKIP);
   $url_options = array('html' => true);
   if ($query) {
@@ -55,10 +55,10 @@ function theme_views_data_export_feed_icon($variables) {
  * @param $file
  *  Link to output file
  */
-function theme_views_data_export_complete_page($variables) {
+function theme_ams_tp_push_complete_page($variables) {
   extract($variables, EXTR_SKIP);
   drupal_set_title(t('Data export successful'));
-  drupal_add_html_head(array('#tag' => 'meta', '#attributes' => array('http-equiv' =>"refresh", 'content' => '3;url='. $file)), 'views_data_export_download');
+  drupal_add_html_head(array('#tag' => 'meta', '#attributes' => array('http-equiv' =>"refresh", 'content' => '3;url='. $file)), 'ams_tp_push_download');
   $output = '';
   $output .= '<p>';
   $output .= t('Your export has been created. View/download the file <a href="@link">here</a> (will automatically download in 3 seconds.)', array('@link' => $file));
@@ -73,7 +73,7 @@ function theme_views_data_export_complete_page($variables) {
 }
 
 
-function template_preprocess_views_data_export(&$vars) {
+function template_preprocess_ams_tp_push(&$vars) {
   $vars['header'] = $vars['rows']['header'];
   $vars['body'] = $vars['rows']['body'];
   $vars['footer'] = $vars['rows']['footer'];
@@ -82,8 +82,8 @@ function template_preprocess_views_data_export(&$vars) {
   $fields   = &$view->field;
 }
 
-function template_preprocess_views_data_export_csv_header(&$vars) {
-  _views_data_export_header_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_csv_header(&$vars) {
+  _ams_tp_push_header_shared_preprocess($vars);
 
   // Make sure we catch saved options that are misspelled. LEGACY
   if (isset($vars['options']['seperator'])) {
@@ -124,8 +124,8 @@ function template_preprocess_views_data_export_csv_header(&$vars) {
   }
 }
 
-function template_preprocess_views_data_export_csv_body(&$vars) {
-  _views_data_export_body_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_csv_body(&$vars) {
+  _ams_tp_push_body_shared_preprocess($vars);
 
   // Make sure we catch saved options that are misspelled. LEGACY
   if (isset($vars['options']['seperator'])) {
@@ -174,9 +174,9 @@ function template_preprocess_views_data_export_csv_body(&$vars) {
 /**
  * Preprocess csv output template.
  */
-function template_preprocess_views_data_export_csv(&$vars) {
+function template_preprocess_ams_tp_push_csv(&$vars) {
   // TODO Replace items with themed_rows.
-  _views_data_export_shared_preprocess($vars);
+  _ams_tp_push_shared_preprocess($vars);
 
   // Make sure we catch saved options that are misspelled. LEGACY
   if (isset($vars['options']['separator'])) {
@@ -240,24 +240,24 @@ function template_preprocess_views_data_export_csv(&$vars) {
 /**
  * Preprocess txt output template.
  */
-function template_preprocess_views_data_export_txt_body(&$vars) {
-  _views_data_export_header_shared_preprocess($vars);
-  _views_data_export_body_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_txt_body(&$vars) {
+  _ams_tp_push_header_shared_preprocess($vars);
+  _ams_tp_push_body_shared_preprocess($vars);
 }
 
-function template_preprocess_views_data_export_doc_body(&$vars) {
+function template_preprocess_ams_tp_push_doc_body(&$vars) {
   // Pass through the generic MS Office preprocess.
-  template_preprocess_views_data_export_msoffice_body($vars);
+  template_preprocess_ams_tp_push_msoffice_body($vars);
 }
 
-function template_preprocess_views_data_export_xls_body(&$vars) {
+function template_preprocess_ams_tp_push_xls_body(&$vars) {
   // Pass through the generic MS Office preprocess.
-  template_preprocess_views_data_export_msoffice_body($vars);
+  template_preprocess_ams_tp_push_msoffice_body($vars);
 }
 
-function template_preprocess_views_data_export_msoffice_body(&$vars) {
-  _views_data_export_header_shared_preprocess($vars);
-  _views_data_export_body_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_msoffice_body(&$vars) {
+  _ams_tp_push_header_shared_preprocess($vars);
+  _ams_tp_push_body_shared_preprocess($vars);
 
   $output = '';
 
@@ -313,18 +313,18 @@ function template_preprocess_views_data_export_msoffice_body(&$vars) {
 
 }
 
-function template_preprocess_views_data_export_doc_header(&$vars) {
+function template_preprocess_ams_tp_push_doc_header(&$vars) {
   // Pass through the generic MS Office preprocess.
-  template_preprocess_views_data_export_msoffice_header($vars);
+  template_preprocess_ams_tp_push_msoffice_header($vars);
 }
 
-function template_preprocess_views_data_export_xls_header(&$vars) {
+function template_preprocess_ams_tp_push_xls_header(&$vars) {
   // Pass through the generic MS Office preprocess.
-  template_preprocess_views_data_export_msoffice_header($vars);
+  template_preprocess_ams_tp_push_msoffice_header($vars);
 }
 
-function template_preprocess_views_data_export_msoffice_header(&$vars) {
-  _views_data_export_header_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_msoffice_header(&$vars) {
+  _ams_tp_push_header_shared_preprocess($vars);
 
   // Need to do a little work to construct the table header, see theme_table().
   $vars['header_row'] = '';
@@ -345,36 +345,36 @@ function template_preprocess_views_data_export_msoffice_header(&$vars) {
 /**
  * Preprocess xml output template.
  */
-function template_preprocess_views_data_export_xml_header(&$vars) {
+function template_preprocess_ams_tp_push_xml_header(&$vars) {
   // Compute the root XML node, using the base table, and appending an 's' if needed.
   $root_node = $vars['view']->base_table;
   if (rtrim($root_node, 's') == $root_node) {
     $root_node .= 's';
   }
-  $vars['root_node'] = _views_data_export_xml_tag_clean($root_node);
+  $vars['root_node'] = _ams_tp_push_xml_tag_clean($root_node);
 }
 
 /**
  * Preprocess xml output template.
  */
-function template_preprocess_views_data_export_xml_footer(&$vars) {
+function template_preprocess_ams_tp_push_xml_footer(&$vars) {
   // Compute the root XML node, using the base table, and appending an 's' if needed.
   $root_node = $vars['view']->base_table;
   if (rtrim($root_node, 's') == $root_node) {
     $root_node .= 's';
   }
-  $vars['root_node'] = _views_data_export_xml_tag_clean($root_node);
+  $vars['root_node'] = _ams_tp_push_xml_tag_clean($root_node);
 }
 
 /**
  * Preprocess xml output template.
  */
-function template_preprocess_views_data_export_xml_body(&$vars) {
-  _views_data_export_header_shared_preprocess($vars);
-  _views_data_export_body_shared_preprocess($vars);
+function template_preprocess_ams_tp_push_xml_body(&$vars) {
+  _ams_tp_push_header_shared_preprocess($vars);
+  _ams_tp_push_body_shared_preprocess($vars);
 
   // Compute the tag name based on the views base table, minus any trailing 's'.
-  $vars['item_node'] = _views_data_export_xml_tag_clean(rtrim($vars['view']->base_table, 's'));
+  $vars['item_node'] = _ams_tp_push_xml_tag_clean(rtrim($vars['view']->base_table, 's'));
 
   foreach ($vars['themed_rows'] as $num => $row) {
     foreach ($row as $field => $content) {
@@ -382,9 +382,16 @@ function template_preprocess_views_data_export_xml_body(&$vars) {
       $content = preg_replace('/&(?!(amp|quot|#039|lt|gt);)/', '&amp;', $content);
       // Convert < and > to HTML entities.
       $content = str_replace(
-        array('<', '>'),
-        array('&lt;', '&gt;'),
+        array('<', '>','&lt;p&gt;', '&lt;/p&gt;', '&#039;'),
+        array('&lt;', '&gt;', '', '', '\''),
         $content);
+        //
+        // DRIVE - ADDED LINE TO REMOVE LINE RETURNS AND SPACES FROM DRUPAL OUTPUT
+        //
+        $content = preg_replace(array('/\\\\n/'), '', $content);
+        $content = preg_replace(array('/\\n/'), '', $content);
+        $content = preg_replace(array('/\\s\s/'), '', $content);
+        $content = preg_replace('/\/ /', '/', $content);
       $vars['themed_rows'][$num][$field] = $content;
     }
   }
@@ -411,7 +418,7 @@ function template_preprocess_views_data_export_xml_body(&$vars) {
       }
     }
     // We should always try to output valid XML.
-    $vars['xml_tag'][$field] = _views_data_export_xml_tag_clean($vars['xml_tag'][$field]);
+    $vars['xml_tag'][$field] = _ams_tp_push_xml_tag_clean($vars['xml_tag'][$field]);
   }
 }
 
@@ -422,7 +429,7 @@ function template_preprocess_views_data_export_xml_body(&$vars) {
  * @return The valid XML tag or an empty string if the string contained no valid
  * XML tag characters.
  */
-function _views_data_export_xml_tag_clean($tag) {
+function _ams_tp_push_xml_tag_clean($tag) {
 
   // This regex matches characters that are not valid in XML tags, and the
   // unicode ones that are. We don't bother with unicode, because it would so
@@ -444,7 +451,7 @@ function _views_data_export_xml_tag_clean($tag) {
 /**
  * Shared helper function for export preprocess functions.
  */
-function _views_data_export_header_shared_preprocess(&$vars) {
+function _ams_tp_push_header_shared_preprocess(&$vars) {
   $view     = $vars['view'];
   $fields   = &$view->field;
 
@@ -460,7 +467,7 @@ function _views_data_export_header_shared_preprocess(&$vars) {
 /**
  * Shared helper function for export preprocess functions.
  */
-function _views_data_export_body_shared_preprocess(&$vars) {
+function _ams_tp_push_body_shared_preprocess(&$vars) {
   $view     = $vars['view'];
   $fields   = &$view->field;
 
