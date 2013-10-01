@@ -49,6 +49,8 @@ function theme_views_data_export_feed_icon($variables) {
   return l($image, $url, $url_options);
 }
 
+
+
 /**
  * Theme callback for the export complete page.
  *
@@ -58,17 +60,23 @@ function theme_views_data_export_feed_icon($variables) {
 function theme_views_data_export_complete_page($variables) {
   extract($variables, EXTR_SKIP);
   drupal_set_title(t('Data export successful'));
-  drupal_add_html_head(array('#tag' => 'meta', '#attributes' => array('http-equiv' =>"refresh", 'content' => '3;url='. $file)), 'views_data_export_download');
+  //drupal_add_html_head(array('#tag' => 'meta', '#attributes' => array('http-equiv' =>"refresh", 'content' => '33;url='. $file)), 'views_data_export_download');
   $output = '';
   $output .= '<p>';
-  $output .= t('Your export has been created. View/download the file <a href="@link">here</a> (will automatically download in 3 seconds.)', array('@link' => $file));
+  $output .= t('Your export has been created. View/download the file <a href="@link" target="_blank">here</a> (will automatically download in 3 seconds.)', array('@link' => $file));
   $output .= '</p>';
+  
+  $output .= '<form action="/ams-submit-feed.php" method="post" name="feedPasser"><input name="feedURL" type="hidden" value="' . $file .'" />';
+  $output .= '<button type="submit">Push to thePlatform</button></form>';
+  
 
+    
   if (!empty($return_url)) {
     $output .= '<p>';
     $output .= l(t('Return to previous page'), $return_url);
     $output .= '</p>';
   }
+  triggerPush($file);
   return $output;
 }
 
@@ -478,3 +486,90 @@ function _views_data_export_body_shared_preprocess(&$vars) {
     }
   }
 }
+
+
+/*
+ *  DL customisation 
+ * /ams-feed2?download=1&eid=41
+
+
+function triggerPush($myFeedPath) {
+    
+
+
+    // Create token url
+    $tokenURL = 'https://identity.auth.theplatform.com/idm/web/Authentication/signIn?form=xml&schema=1.0&username=mpx/David%20Long&password=8Numbers';
+
+    // GET TOKEN
+    function getToken($tokenFeed) {
+            $signInResponse  = simplexml_load_file($tokenFeed);
+            if ($signInResponse->return->token){
+            $tokenVal =  $signInResponse->return->token;
+
+            // Display the token value to the user	
+            echo 'TOKEN VALUE: '. $tokenVal;
+            }
+            else {
+                    return 'fail';
+            }
+            return $tokenVal;
+    }
+
+  $file_name_with_full_path = 'http://' . $_SERVER['SERVER_NAME'] . ':8082' . $myFeedPath;
+  echo 'path: ' . $file_name_with_full_path . '<br />'; 
+
+  // If all good load the file and display XML title and name of first record
+  $xmlstr  = simplexml_load_file($file_name_with_full_path);
+ 	echo '<p>XML Loaded: ' . $xmlstr->channel->title . '</p>';
+ 	echo '<p>1st record: ' . $xmlstr->channel->item[0]->title . '</p>';
+ 
+ 	
+ // Get file contents	
+  $xml_builder = file_get_contents($file_name_with_full_path);
+ 
+  $token = getToken($tokenURL);
+  
+  //Check if valid token acquired
+  if ($token == 'fail' || $token == NULL) {
+  echo '<h2>Username/Password Invalid</h2>';
+  }
+  else {
+  // Call the Push to thePlaform passing in the Token and the XML content from AMS
+  push2TP($token, $xml_builder);
+  
+  
+  }
+  
+  
+  
+}
+
+
+// Push to thePlaform using CURL in a single post
+    function push2TP($token, $xml_builder) {
+    // We send XML via CURL using POST with a http header of text/xml.
+    $ch = curl_init('http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI']);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/xml'));
+    curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $xml_builder);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 0);
+    curl_setopt($ch, CURLOPT_URL, "http://ingest.theplatform.com/ingest?account=http://access.auth.theplatform.com/data/Account/2296157121&token=" . $token . "&pid=ukAms");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $ch_result = curl_exec($ch);
+    curl_close($ch);
+    // Print CURL result.
+    echo 'RESULT: '. $ch_result;
+    $successMessage = '<ingest:error>false</ingest:error>';
+    if (strpos($ch_result, $successMessage) !== false)  {
+          echo '<h2 style="color: green">Metadata Submission SUCCESSFUL</h2>';
+    }
+    else {
+          echo '<h2 style="color: red">Metadata Submission FAILED</h2>';
+    }
+
+
+    }
+ * 
+ *  
+ */
